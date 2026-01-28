@@ -1,0 +1,9 @@
+# Project exclude paths
+/myvet-app/target/
+/myvet-appointment/target/
+/myvet-auth/target/
+/myvet-common/target/
+/myvet-data-access/target/
+/myvet-notification/target/
+/myvet-pet/target/
+/myvet-vet/target/

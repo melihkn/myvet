@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.0</version>
+    </parent>
+    
+    <groupId>com.myvet</groupId>
+    <artifactId>myvet-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>                <!-- IMPORTANT: pom, not jar -->
+    
+    <modules>
+        <module>myvet-common</module>
+        <module>myvet-data-access</module>
+        <module>myvet-auth</module>
+        <module>myvet-vet</module>
+        <module>myvet-pet</module>
+        <module>myvet-appointment</module>
+        <module>myvet-notification</module>
+        <module>myvet-app</module>
+    </modules>
+    
+    <properties>
+        <java.version>21</java.version>
+        <jjwt.version>0.12.3</jjwt.version>
+    </properties>
+    
+    <!-- Shared dependency versions -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Internal modules -->
+            <dependency>
+                <groupId>com.myvet</groupId>
+                <artifactId>myvet-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.myvet</groupId>
+                <artifactId>myvet-data-access</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.myvet</groupId>
+                <artifactId>myvet-auth</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.myvet</groupId>
+                <artifactId>myvet-vet</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.myvet</groupId>
+                <artifactId>myvet-pet</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.myvet</groupId>
+                <artifactId>myvet-appointment</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.myvet</groupId>
+                <artifactId>myvet-notification</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <!-- JWT -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
+    <!-- Dependencies ALL modules get -->
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+</project>
