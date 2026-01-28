@@ -25,3 +25,10 @@ jwt:
   secret: dGhpc2lzYXZlcnlsb25nc2VjcmV0a2V5Zm9yand0dG9rZW5zaWduaW5nYW5kaXRzaG91bGRiZWF0bGVhc3QyNTZiaXRz
   access-token-expiration: 86400000   # 24 hours
   refresh-token-expiration: 604800000  # 7 days
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
