@@ -6,10 +6,10 @@ import com.myvet.auth.dto.request.OwnerRegisterRequest;
 import com.myvet.auth.dto.request.RefreshTokenRequest;
 import com.myvet.auth.dto.request.VetRegisterRequest;
 import com.myvet.auth.dto.response.AuthResponse;
-import com.myvet.dataaccess.clinic.Clinic;
+import com.myvet.auth.security.OwnerUserDetails;
+import com.myvet.auth.security.VetUserDetails;
 import com.myvet.dataaccess.enums.Role;
 import com.myvet.dataaccess.owner.Owner;
-import com.myvet.dataaccess.repository.ClinicRepository;
 import com.myvet.dataaccess.repository.OwnerRepository;
 import com.myvet.dataaccess.repository.VetRepository;
 import com.myvet.dataaccess.vet.Vet;
@@ -21,13 +21,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final VetRepository vetRepository;
     private final OwnerRepository ownerRepository;
-    private final ClinicRepository clinicRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -47,13 +48,6 @@ public class AuthService {
             throw new RuntimeException("License number already registered");
         }
 
-        // Get clinic if provided
-        Clinic clinic = null;
-        if (request.getClinicId() != null) {
-            clinic = clinicRepository.findById(request.getClinicId())
-                    .orElseThrow(() -> new RuntimeException("Clinic not found"));
-        }
-
         // Create vet directly (no separate User entity)
         Vet vet = Vet.builder()
                 .firstName(request.getFirstName())
@@ -64,17 +58,18 @@ public class AuthService {
                 .licenseNumber(request.getLicenseNumber())
                 .specialization(request.getSpecialization())
                 .bio(request.getBio())
-                .clinic(clinic)
-                .enabled(true)
                 .build();
 
+        vet.setCreatedAt(LocalDateTime.now());
+        vet.setUpdatedAt(LocalDateTime.now());
         vetRepository.save(vet);
 
-        // Generate tokens
-        String accessToken = jwtService.generateAccessToken(vet);
-        String refreshToken = jwtService.generateRefreshToken(vet);
+        // Create wrapper and generate tokens
+        VetUserDetails vetUserDetails = new VetUserDetails(vet);
+        String accessToken = jwtService.generateAccessToken(vetUserDetails);
+        String refreshToken = jwtService.generateRefreshToken(vetUserDetails);
 
-        return buildAuthResponse(vet.getVid(), vet.getEmail(), vet.getFirstName(), vet.getLastName(), vet.getRole(), accessToken, refreshToken);
+        return buildAuthResponse(vet.getVid(), vet.getEmail(), vet.getFirstName(), vet.getLastName(), Role.VET, accessToken, refreshToken);
     }
 
     /**
@@ -104,13 +99,17 @@ public class AuthService {
                 .enabled(true)
                 .build();
 
+        owner.setUpdatedAt(LocalDateTime.now());
+        owner.setCreatedAt(LocalDateTime.now());
+
         ownerRepository.save(owner);
 
-        // Generate tokens
-        String accessToken = jwtService.generateAccessToken(owner);
-        String refreshToken = jwtService.generateRefreshToken(owner);
+        // Create wrapper and generate tokens
+        OwnerUserDetails ownerUserDetails = new OwnerUserDetails(owner);
+        String accessToken = jwtService.generateAccessToken(ownerUserDetails);
+        String refreshToken = jwtService.generateRefreshToken(ownerUserDetails);
 
-        return buildAuthResponse(owner.getId(), owner.getEmail(), owner.getFirstName(), owner.getLastName(), owner.getRole(), accessToken, refreshToken);
+        return buildAuthResponse(owner.getId(), owner.getEmail(), owner.getFirstName(), owner.getLastName(), Role.PET_OWNER, accessToken, refreshToken);
     }
 
     /**
@@ -151,29 +150,31 @@ public class AuthService {
     }
 
     /**
-     * Find a user (Owner or Vet) by email
+     * Find a user (Owner or Vet) by email and wrap in UserDetails
      */
     private UserDetails findUserByEmail(String email) {
-        // Try Owner first
-        var owner = ownerRepository.findByEmail(email);
-        if (owner.isPresent()) {
-            return owner.get();
-        }
-
-        // Then try Vet
+        // Try Vet first
         var vet = vetRepository.findByEmail(email);
         if (vet.isPresent()) {
-            return vet.get();
+            return new VetUserDetails(vet.get());
+        }
+
+        // Then try Owner
+        var owner = ownerRepository.findByEmail(email);
+        if (owner.isPresent()) {
+            return new OwnerUserDetails(owner.get());
         }
 
         throw new RuntimeException("User not found with email: " + email);
     }
 
     private AuthResponse buildAuthResponseFromUserDetails(UserDetails userDetails, String accessToken, String refreshToken) {
-        if (userDetails instanceof Owner owner) {
-            return buildAuthResponse(owner.getId(), owner.getEmail(), owner.getFirstName(), owner.getLastName(), owner.getRole(), accessToken, refreshToken);
-        } else if (userDetails instanceof Vet vet) {
-            return buildAuthResponse(vet.getVid(), vet.getEmail(), vet.getFirstName(), vet.getLastName(), vet.getRole(), accessToken, refreshToken);
+        if (userDetails instanceof OwnerUserDetails ownerDetails) {
+            Owner owner = ownerDetails.getOwner();
+            return buildAuthResponse(owner.getId(), owner.getEmail(), owner.getFirstName(), owner.getLastName(), Role.PET_OWNER, accessToken, refreshToken);
+        } else if (userDetails instanceof VetUserDetails vetDetails) {
+            Vet vet = vetDetails.getVet();
+            return buildAuthResponse(vet.getVid(), vet.getEmail(), vet.getFirstName(), vet.getLastName(), Role.VET, accessToken, refreshToken);
         }
         throw new RuntimeException("Unknown user type");
     }
@@ -194,3 +195,4 @@ public class AuthService {
                 .build();
     }
 }
+

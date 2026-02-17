@@ -7,6 +7,14 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+      </profile>
+      <profile name="Annotation profile for myvet-parent" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
+        </processorPath>
         <module name="myvet-vet" />
         <module name="myvet-data-access" />
         <module name="myvet-pet" />
@@ -26,6 +34,7 @@
       <module name="myvet-common" options="-parameters" />
       <module name="myvet-data-access" options="-parameters" />
       <module name="myvet-notification" options="-parameters" />
+      <module name="myvet-parent" options="-parameters" />
       <module name="myvet-pet" options="-parameters" />
       <module name="myvet-vet" options="-parameters" />
     </option>

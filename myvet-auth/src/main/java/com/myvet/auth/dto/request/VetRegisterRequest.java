@@ -32,6 +32,4 @@ public class VetRegisterRequest {
     private String specialization;
 
     private String bio;
-
-    private Integer clinicId;
 }

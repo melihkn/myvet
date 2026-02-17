@@ -2,7 +2,6 @@ package com.myvet.dataaccess.pet;
 
 import com.myvet.dataaccess.enums.Enums.HealthStatus;
 import com.myvet.dataaccess.baseentity.BaseEntity;
-import com.myvet.dataaccess.clinic.Clinic;
 import com.myvet.dataaccess.owner.Owner;
 import com.myvet.dataaccess.vet.Vet;
 import jakarta.persistence.*;
@@ -23,10 +22,6 @@ public class Pet extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "kid", nullable = false)
-    private Clinic clinic;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vid", nullable = false)

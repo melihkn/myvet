@@ -1,6 +1,8 @@
 // myvet-auth/src/main/java/com/myvet/auth/service/UserDetailsServiceImpl.java
 package com.myvet.auth.service;
 
+import com.myvet.auth.security.OwnerUserDetails;
+import com.myvet.auth.security.VetUserDetails;
 import com.myvet.dataaccess.repository.OwnerRepository;
 import com.myvet.dataaccess.repository.VetRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,8 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,15 +20,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Try Owner first, then Vet
-        Optional<? extends UserDetails> user = ownerRepository.findByEmail(username)
-                .map(o -> (UserDetails) o);
-
-        if (user.isEmpty()) {
-            user = vetRepository.findByEmail(username)
-                    .map(v -> (UserDetails) v);
+        // Try to find as Vet first
+        var vet = vetRepository.findByEmail(username);
+        if (vet.isPresent()) {
+            return new VetUserDetails(vet.get());
         }
 
-        return user.orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        // Try to find as Owner
+        var owner = ownerRepository.findByEmail(username);
+        if (owner.isPresent()) {
+            return new OwnerUserDetails(owner.get());
+        }
+
+        throw new UsernameNotFoundException("User not found: " + username);
     }
 }
