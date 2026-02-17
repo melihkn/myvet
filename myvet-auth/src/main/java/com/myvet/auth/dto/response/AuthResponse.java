@@ -17,7 +17,7 @@ public class AuthResponse {
     @Data
     @Builder
     public static class UserInfo {
-        private Long id;
+        private Integer id;
         private String email;
         private String firstName;
         private String lastName;
