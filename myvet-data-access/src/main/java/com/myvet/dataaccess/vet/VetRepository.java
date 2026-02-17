@@ -1,6 +1,5 @@
-package com.myvet.dataaccess.repository;
+package com.myvet.dataaccess.vet;
 
-import com.myvet.dataaccess.vet.Vet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

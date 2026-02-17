@@ -3,8 +3,8 @@ package com.myvet.auth.service;
 
 import com.myvet.auth.security.OwnerUserDetails;
 import com.myvet.auth.security.VetUserDetails;
-import com.myvet.dataaccess.repository.OwnerRepository;
-import com.myvet.dataaccess.repository.VetRepository;
+import com.myvet.dataaccess.owner.OwnerRepository;
+import com.myvet.dataaccess.vet.VetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
